@@ -197,14 +197,10 @@ async function runSearch() {
  * Render Results
  */
 
-function renderResults(
-  results,
-  category
-) {
+function renderResults(results, category) {
 
   resultsContainer.innerHTML =
     results.map(item => {
-
 
       const isBook =
         category === "book";
@@ -216,7 +212,6 @@ function renderResults(
 
       let primaryMeta =
         "";
-
 
       let secondaryMeta =
         "";
@@ -233,7 +228,6 @@ function renderResults(
           item.pub_house
             ? `Published by ${item.pub_house}`
             : "";
-
 
       } else {
 
@@ -282,6 +276,10 @@ function renderResults(
           `;
 
 
+      /*
+       * Save button
+       */
+
       return `
 
         <article class="result-item">
@@ -291,11 +289,12 @@ function renderResults(
 
           <div class="result-info">
 
-
             <h2 class="result-title">
+
               ${escapeHtml(
                 item.title || "Unknown"
               )}
+
             </h2>
 
 
@@ -332,14 +331,168 @@ function renderResults(
             }
 
 
+            <button
+              class="save-button"
+              data-uuid="${escapeHtml(item.uuid)}"
+            >
+              Save to Library
+            </button>
+
+
           </div>
 
         </article>
 
       `;
 
-
     }).join("");
+
+async function saveMediaItem(
+  item,
+  button
+) {
+
+  console.log(
+    "Saving item:",
+    item
+  );
+
+
+  button.disabled =
+    true;
+
+  button.textContent =
+    "Saving...";
+
+
+  try {
+
+    const {
+      data,
+      error
+    } = await supabaseClient
+
+      .from("media_items")
+
+      .upsert({
+
+        neodb_uuid:
+          item.uuid,
+
+        neodb_id:
+          item.id,
+
+        neodb_url:
+          item.url,
+
+        api_url:
+          item.api_url,
+
+        category:
+          item.category,
+
+        title:
+          item.title,
+
+        cover_image_url:
+          item.cover_image_url,
+
+        description:
+          item.description,
+
+        rating:
+          item.rating,
+
+        rating_count:
+          item.rating_count,
+
+        raw_data:
+          item
+
+      },
+    {
+  onConflict: "neodb_uuid"
+})
+
+      .select()
+
+
+      if (error) {
+
+        throw error;
+
+      }
+
+
+      console.log(
+        "Saved successfully:",
+        data
+      );
+
+
+      button.textContent =
+        "Saved ✓";
+
+
+      button.classList.add(
+        "saved"
+      );
+
+
+  } catch (error) {
+
+    console.error(
+      "Save failed:",
+      error
+    );
+
+
+    button.disabled =
+      false;
+
+
+    button.textContent =
+      "Save failed — Try again";
+
+  }
+
+}
+  /*
+   * Save button events
+   */
+
+  document
+    .querySelectorAll(".save-button")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          const uuid =
+            button.dataset.uuid;
+
+
+          const item =
+            results.find(
+              result =>
+                result.uuid === uuid
+            );
+
+
+          if (item) {
+
+            saveMediaItem(
+              item,
+              button
+            );
+
+          }
+
+        }
+      );
+
+    });
 
 }
 
@@ -359,30 +512,3 @@ function escapeHtml(value) {
 
 }
 
-async function testSupabase() {
-  console.log("TEST FUNCTION STARTING");
-
-  try {
-    const { data, error } = await supabaseClient
-      .from("media_items")
-      .insert({
-        neodb_uuid: "test-item-001",
-        category: "book",
-        title: "Supabase Test Book"
-      })
-      .select();
-
-    console.log("Supabase response:", {
-      data,
-      error
-    });
-
-  } catch (error) {
-    console.error(
-      "Unexpected error:",
-      error
-    );
-  }
-}
-
-//testSupabase();
