@@ -347,116 +347,98 @@ function renderResults(results, category) {
 
     }).join("");
 
-async function saveMediaItem(
-  item,
-  button
-) {
+async function saveMediaItem(item, button) {
 
-  console.log(
-    "Saving item:",
-    item
-  );
+  console.log("Saving item:", item);
 
-
-  button.disabled =
-    true;
-
-  button.textContent =
-    "Saving...";
-
+  button.disabled = true;
+  button.textContent = "Saving...";
 
   try {
 
-    const {
-      data,
-      error
-    } = await supabaseClient
+    // 1. Check whether it already exists
+    const { data: existingItem, error: checkError } =
+      await supabaseClient
+        .from("media_items")
+        .select("id")
+        .eq("neodb_uuid", item.uuid)
+        .maybeSingle();
 
-      .from("media_items")
+    if (checkError) {
+      throw checkError;
+    }
 
-      .upsert(
-  {
-    neodb_uuid: item.uuid,
+    // 2. Already exists
+    if (existingItem) {
 
-    neodb_id: item.id,
+      console.log("Item already exists.");
 
-    neodb_url: item.url,
+      button.textContent = "Already saved";
+      button.classList.add("saved");
 
-    api_url: item.api_url,
+      return;
+    }
 
-    category: item.category,
+    // 3. Insert only when it does not exist
+    const { data, error } =
+      await supabaseClient
+        .from("media_items")
+        .insert({
+          neodb_uuid: item.uuid,
 
-    title: item.title,
+          neodb_id: item.id,
 
-    display_title: item.display_title,
+          neodb_url: item.url,
 
-    orig_title: item.orig_title,
+          api_url: item.api_url,
 
-    cover_image_url: item.cover_image_url,
+          category: item.category,
 
-    description: item.description,
+          title: item.title,
 
-    neodb_rating: item.rating,
+          display_title: item.display_title,
 
-    neodb_rating_count: item.rating_count,
+          orig_title: item.orig_title,
 
-    tags: item.tags,
+          cover_image_url: item.cover_image_url,
 
-    director: item.director,
+          description: item.description,
 
-    playwright: item.playwright,
+          neodb_rating: item.rating,
 
-    actor: item.actor,
+          neodb_rating_count: item.rating_count,
 
-    genre: item.genre,
+          tags: item.tags,
 
-    language: item.language,
+          director: item.director,
 
-    raw_data: item
-  },
-  {
-    onConflict: "neodb_uuid"
-  }
-)
-.select();
+          playwright: item.playwright,
 
+          actor: item.actor,
 
-      if (error) {
+          genre: item.genre,
 
-        throw error;
+          language: item.language,
 
-      }
+          raw_data: item
+        })
+        .select();
 
+    if (error) {
+      throw error;
+    }
 
-      console.log(
-        "Saved successfully:",
-        data
-      );
+    console.log("Saved successfully:", data);
 
-
-      button.textContent =
-        "Saved ✓";
-
-
-      button.classList.add(
-        "saved"
-      );
-
+    button.textContent = "Saved";
+    button.classList.add("saved");
 
   } catch (error) {
 
-    console.error(
-      "Save failed:",
-      error
-    );
+    console.error("Save failed:", error);
 
-
-    button.disabled =
-      false;
-
-
-    button.textContent =
-      "Save failed — Try again";
+    button.disabled = false;
+    button.textContent = "Save";
 
   }
 
