@@ -374,47 +374,51 @@ async function saveMediaItem(
 
       .from("media_items")
 
-      .upsert({
+      .upsert(
+  {
+    neodb_uuid: item.uuid,
 
-        neodb_uuid:
-          item.uuid,
+    neodb_id: item.id,
 
-        neodb_id:
-          item.id,
+    neodb_url: item.url,
 
-        neodb_url:
-          item.url,
+    api_url: item.api_url,
 
-        api_url:
-          item.api_url,
+    category: item.category,
 
-        category:
-          item.category,
+    title: item.title,
 
-        title:
-          item.title,
+    display_title: item.display_title,
 
-        cover_image_url:
-          item.cover_image_url,
+    orig_title: item.orig_title,
 
-        description:
-          item.description,
+    cover_image_url: item.cover_image_url,
 
-        rating:
-          item.rating,
+    description: item.description,
 
-        rating_count:
-          item.rating_count,
+    neodb_rating: item.rating,
 
-        raw_data:
-          item
+    neodb_rating_count: item.rating_count,
 
-      },
-    {
-  onConflict: "neodb_uuid"
-})
+    tags: item.tags,
 
-      .select()
+    director: item.director,
+
+    playwright: item.playwright,
+
+    actor: item.actor,
+
+    genre: item.genre,
+
+    language: item.language,
+
+    raw_data: item
+  },
+  {
+    onConflict: "neodb_uuid"
+  }
+)
+.select();
 
 
       if (error) {
