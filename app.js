@@ -1,3 +1,12 @@
+const SUPABASE_URL = "https://jkucxovuslrrszxtcqch.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_XvRbXvtkXOstDP9Au6_paQ_v8bBTfmP";
+
+const supabase = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
 const BASE_SEARCH_API_URL =
   "https://neodb.social/api/catalog/search";
 
@@ -347,3 +356,22 @@ function escapeHtml(value) {
     .replace(/'/g, "&#039;");
 
 }
+
+async function testSupabase() {
+  const { data, error } = await supabase
+    .from("items")
+    .insert({
+      uuid: "test-item-001",
+      category: "book",
+      title: "Supabase Test Book"
+    })
+    .select();
+
+  if (error) {
+    console.error("Supabase error:", error);
+  } else {
+    console.log("Supabase success:", data);
+  }
+}
+
+testSupabase();
