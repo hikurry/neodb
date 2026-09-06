@@ -1,8 +1,10 @@
+console.log("APP.JS LOADED");
+
 const SUPABASE_URL = "https://jkucxovuslrrszxtcqch.supabase.co";
 
 const SUPABASE_KEY = "sb_publishable_XvRbXvtkXOstDP9Au6_paQ_v8bBTfmP";
 
-const supabase = window.supabase.createClient(
+const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
@@ -358,19 +360,28 @@ function escapeHtml(value) {
 }
 
 async function testSupabase() {
-  const { data, error } = await supabase
-    .from("items")
-    .insert({
-      uuid: "test-item-001",
-      category: "book",
-      title: "Supabase Test Book"
-    })
-    .select();
+  console.log("TEST FUNCTION STARTING");
 
-  if (error) {
-    console.error("Supabase error:", error);
-  } else {
-    console.log("Supabase success:", data);
+  try {
+    const { data, error } = await supabaseClient
+      .from("items")
+      .insert({
+        uuid: "test-item-001",
+        category: "book",
+        title: "Supabase Test Book"
+      })
+      .select();
+
+    console.log("Supabase response:", {
+      data,
+      error
+    });
+
+  } catch (error) {
+    console.error(
+      "Unexpected error:",
+      error
+    );
   }
 }
 
