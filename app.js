@@ -364,7 +364,7 @@ async function testSupabase() {
 
   try {
     const { data, error } = await supabaseClient
-      .from("items")
+      .from("media_items")
       .insert({
         uuid: "test-item-001",
         category: "book",
