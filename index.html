@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>NeoDB Search</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <main class="app">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">◌</div>
+
+      <div>
+        <h1>NeoDB Search</h1>
+        <p>Find something worth reading or watching.</p>
+      </div>
+    </header>
+
+
+    <!-- Search -->
+    <section class="search-section">
+
+      <div class="search-bar">
+
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="Search NeoDB..."
+          autocomplete="off"
+        >
+
+        <button id="searchButton">
+          Search
+        </button>
+
+      </div>
+
+
+      <!-- Category -->
+      <div class="category-switch">
+
+        <button
+          class="category active"
+          data-category="book"
+        >
+          Books
+        </button>
+
+        <button
+          class="category"
+          data-category="movietv"
+        >
+          Movies & TV
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- Status -->
+    <div id="status" class="status">
+      Search for something you love.
+    </div>
+
+
+    <!-- Results -->
+    <section id="results" class="results"></section>
+
+
+  </main>
+
+
+  <script src="app.js"></script>
+
+</body>
+</html>
