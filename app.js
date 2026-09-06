@@ -366,7 +366,7 @@ async function testSupabase() {
     const { data, error } = await supabaseClient
       .from("media_items")
       .insert({
-        uuid: "test-item-001",
+        neodb_uuid: "test-item-001",
         category: "book",
         title: "Supabase Test Book"
       })
