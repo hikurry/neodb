@@ -372,94 +372,282 @@ async function saveMediaItem(item, button) {
 
   console.log("Saving item:", item);
 
+
   button.disabled = true;
   button.textContent = "Saving...";
 
+
   try {
 
-    // 1. Check whether it already exists
-    const { data: existingItem, error: checkError } =
+    /*
+     * 1. Get current user
+     */
+
+    const {
+      data: {
+        session
+      }
+    } =
+      await supabaseClient.auth
+        .getSession();
+
+
+    if (!session) {
+
+      throw new Error(
+        "Please sign in first."
+      );
+
+    }
+
+
+    const userId =
+      session.user.id;
+
+
+    /*
+     * 2. Check whether media item exists
+     */
+
+    const {
+      data: existingMediaItem,
+      error: mediaCheckError
+    } =
       await supabaseClient
         .from("media_items")
         .select("id")
-        .eq("neodb_uuid", item.uuid)
+        .eq(
+          "neodb_uuid",
+          item.uuid
+        )
         .maybeSingle();
 
-    if (checkError) {
-      throw checkError;
+
+    if (mediaCheckError) {
+
+      throw mediaCheckError;
+
     }
 
-    // 2. Already exists
-    if (existingItem) {
 
-      console.log("Item already exists.");
+    let mediaItemId;
 
-      button.textContent = "Already saved";
-      button.classList.add("saved");
+
+    /*
+     * 3. Use existing media item
+     */
+
+    if (existingMediaItem) {
+
+      console.log(
+        "Media item already exists:",
+        existingMediaItem.id
+      );
+
+
+      mediaItemId =
+        existingMediaItem.id;
+
+
+    } else {
+
+      /*
+       * 4. Insert media item
+       */
+
+      const {
+        data: newMediaItem,
+        error: mediaInsertError
+      } =
+        await supabaseClient
+          .from("media_items")
+          .insert({
+            neodb_uuid: item.uuid,
+
+            neodb_id: item.id,
+
+            neodb_url: item.url,
+
+            api_url: item.api_url,
+
+            category: item.category,
+
+            title: item.title,
+
+            display_title: item.display_title,
+
+            orig_title: item.orig_title,
+
+            cover_image_url:
+              item.cover_image_url,
+
+            description:
+              item.description,
+
+            neodb_rating:
+              item.rating,
+
+            neodb_rating_count:
+              item.rating_count,
+
+            tags:
+              item.tags,
+
+            director:
+              item.director,
+
+            playwright:
+              item.playwright,
+
+            actor:
+              item.actor,
+
+            genre:
+              item.genre,
+
+            language:
+              item.language,
+
+            raw_data:
+              item
+          })
+          .select()
+          .single();
+
+
+      if (mediaInsertError) {
+
+        throw mediaInsertError;
+
+      }
+
+
+      console.log(
+        "Media item inserted:",
+        newMediaItem
+      );
+
+
+      mediaItemId =
+        newMediaItem.id;
+
+    }
+
+
+    /*
+     * 5. Check whether already in user's library
+     */
+
+    const {
+      data: existingLibraryItem,
+      error: libraryCheckError
+    } =
+      await supabaseClient
+        .from("library_items")
+        .select("id")
+        .eq(
+          "user_id",
+          userId
+        )
+        .eq(
+          "media_item_id",
+          mediaItemId
+        )
+        .maybeSingle();
+
+
+    if (libraryCheckError) {
+
+      throw libraryCheckError;
+
+    }
+
+
+    /*
+     * 6. Already in library
+     */
+
+    if (existingLibraryItem) {
+
+      console.log(
+        "Item already exists in library."
+      );
+
+
+      button.textContent =
+        "Already saved";
+
+      button.classList.add(
+        "saved"
+      );
 
       return;
+
     }
 
-    // 3. Insert only when it does not exist
-    const { data, error } =
+
+    /*
+     * 7. Add to library
+     */
+
+    const {
+      data: newLibraryItem,
+      error: libraryInsertError
+    } =
       await supabaseClient
-        .from("media_items")
+        .from("library_items")
         .insert({
-          neodb_uuid: item.uuid,
+          user_id:
+            userId,
 
-          neodb_id: item.id,
+          media_item_id:
+            mediaItemId,
 
-          neodb_url: item.url,
-
-          api_url: item.api_url,
-
-          category: item.category,
-
-          title: item.title,
-
-          display_title: item.display_title,
-
-          orig_title: item.orig_title,
-
-          cover_image_url: item.cover_image_url,
-
-          description: item.description,
-
-          neodb_rating: item.rating,
-
-          neodb_rating_count: item.rating_count,
-
-          tags: item.tags,
-
-          director: item.director,
-
-          playwright: item.playwright,
-
-          actor: item.actor,
-
-          genre: item.genre,
-
-          language: item.language,
-
-          raw_data: item
+          status:
+            "planned"
         })
-        .select();
+        .select()
+        .single();
 
-    if (error) {
-      throw error;
+
+    if (libraryInsertError) {
+
+      throw libraryInsertError;
+
     }
 
-    console.log("Saved successfully:", data);
 
-    button.textContent = "Saved";
-    button.classList.add("saved");
+    console.log(
+      "Added to library:",
+      newLibraryItem
+    );
+
+
+    /*
+     * 8. Update button
+     */
+
+    button.textContent =
+      "Saved";
+
+    button.classList.add(
+      "saved"
+    );
+
 
   } catch (error) {
 
-    console.error("Save failed:", error);
+    console.error(
+      "Save failed:",
+      error
+    );
 
-    button.disabled = false;
-    button.textContent = "Save";
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      "Save to Library";
 
   }
 
