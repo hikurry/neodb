@@ -9,23 +9,26 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_KEY
 );
 
-async function testSignIn() {
-  const email = "joypan4442@gmail.com";
-  const password = "neodb727626pjy";
+const authSection =
+  document.getElementById("authSection");
 
-  const { data, error } =
-    await supabaseClient.auth.signInWithPassword({
-      email,
-      password
-    });
+const appContent =
+  document.getElementById("appContent");
 
-  console.log("SIGN IN:", {
-    data,
-    error
-  });
-}
+const authStatus =
+  document.getElementById("authStatus");
 
-testSignIn();
+const emailInput =
+  document.getElementById("emailInput");
+
+const passwordInput =
+  document.getElementById("passwordInput");
+
+const signInButton =
+  document.getElementById("signInButton");
+
+const authMessage =
+  document.getElementById("authMessage");
 
 const BASE_SEARCH_API_URL =
   "https://neodb.social/api/catalog/search";
@@ -516,3 +519,195 @@ function escapeHtml(value) {
 
 }
 
+async function signIn() {
+
+  const email =
+    emailInput.value.trim();
+
+  const password =
+    passwordInput.value;
+
+
+  if (!email || !password) {
+
+    authMessage.textContent =
+      "Please enter your email and password.";
+
+    return;
+
+  }
+
+
+  signInButton.disabled =
+    true;
+
+
+  authMessage.textContent =
+    "Signing in...";
+
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth
+        .signInWithPassword({
+          email,
+          password
+        });
+
+
+    if (error) {
+
+      throw error;
+
+    }
+
+
+    console.log(
+      "SIGNED IN:",
+      data
+    );
+
+
+    passwordInput.value =
+      "";
+
+
+    await updateAuthUI();
+
+
+  } catch (error) {
+
+    console.error(
+      "Sign in failed:",
+      error
+    );
+
+
+    authMessage.textContent =
+      error.message;
+
+  } finally {
+
+    signInButton.disabled =
+      false;
+
+  }
+
+}
+
+async function updateAuthUI() {
+
+  const {
+    data: {
+      session
+    }
+  } =
+    await supabaseClient.auth
+      .getSession();
+
+
+  if (session) {
+
+    console.log(
+      "Current user:",
+      session.user
+    );
+
+
+    authSection.hidden =
+      true;
+
+
+    appContent.hidden =
+      false;
+
+
+    authStatus.innerHTML =
+      `
+        <div class="signed-in-user">
+          ${escapeHtml(
+            session.user.email
+          )}
+        </div>
+
+        <button
+          id="signOutButton"
+          class="sign-out-button"
+        >
+          Sign out
+        </button>
+      `;
+
+
+    document
+      .getElementById("signOutButton")
+      .addEventListener(
+        "click",
+        signOut
+      );
+
+
+  } else {
+
+    authSection.hidden =
+      false;
+
+
+    appContent.hidden =
+      true;
+
+
+    authStatus.innerHTML =
+      "";
+
+  }
+
+}
+
+async function signOut() {
+
+  const {
+    error
+  } =
+    await supabaseClient.auth
+      .signOut();
+
+
+  if (error) {
+
+    console.error(
+      "Sign out failed:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  await updateAuthUI();
+
+}
+
+signInButton.addEventListener(
+  "click",
+  signIn
+);
+passwordInput.addEventListener(
+  "keydown",
+  event => {
+
+    if (event.key === "Enter") {
+
+      signIn();
+
+    }
+
+  }
+);
+
+updateAuthUI();

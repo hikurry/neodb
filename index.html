@@ -18,69 +18,142 @@
 
     <!-- Header -->
     <header class="header">
+
       <div class="logo">◌</div>
 
-      <div>
-        <h1>NeoDB Search</h1>
-        <p>Find something worth reading or watching.</p>
+      <div class="header-content">
+
+        <div>
+
+          <h1>NeoDB Search</h1>
+
+          <p>Find something worth reading or watching.</p>
+
+        </div>
+
+        <!-- Auth Status -->
+        <div
+          id="authStatus"
+          class="auth-status"
+        ></div>
+
       </div>
+
     </header>
 
 
-    <!-- Search -->
-    <section class="search-section">
+    <!-- Login -->
+    <section
+      id="authSection"
+      class="auth-section"
+    >
 
-      <div class="search-bar">
+      <div class="auth-card">
 
-        <input
-          id="searchInput"
-          type="text"
-          placeholder="Search NeoDB..."
-          autocomplete="off"
-        >
+        <h2>Sign in</h2>
 
-        <button id="searchButton">
-          Search
-        </button>
+        <div class="auth-form">
 
-      </div>
+          <input
+            id="emailInput"
+            type="email"
+            placeholder="Email"
+            autocomplete="email"
+          >
 
+          <input
+            id="passwordInput"
+            type="password"
+            placeholder="Password"
+            autocomplete="current-password"
+          >
 
-      <!-- Category -->
-      <div class="category-switch">
+          <button id="signInButton">
+            Sign in
+          </button>
 
-        <button
-          class="category active"
-          data-category="book"
-        >
-          Books
-        </button>
+        </div>
 
-        <button
-          class="category"
-          data-category="movietv"
-        >
-          Movies & TV
-        </button>
+        <p
+          id="authMessage"
+          class="auth-message"
+        ></p>
 
       </div>
 
     </section>
 
 
-    <!-- Status -->
-    <div id="status" class="status">
-      Search for something you love.
+    <!-- App Content -->
+    <div
+      id="appContent"
+      class="app-content"
+      hidden
+    >
+
+      <!-- Search -->
+      <section class="search-section">
+
+        <div class="search-bar">
+
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="Search NeoDB..."
+            autocomplete="off"
+          >
+
+          <button id="searchButton">
+            Search
+          </button>
+
+        </div>
+
+
+        <!-- Category -->
+        <div class="category-switch">
+
+          <button
+            class="category active"
+            data-category="book"
+          >
+            Books
+          </button>
+
+          <button
+            class="category"
+            data-category="movietv"
+          >
+            Movies & TV
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- Status -->
+      <div
+        id="status"
+        class="status"
+      >
+        Search for something you love.
+      </div>
+
+
+      <!-- Results -->
+      <section
+        id="results"
+        class="results"
+      ></section>
+
     </div>
-
-
-    <!-- Results -->
-    <section id="results" class="results"></section>
-
 
   </main>
 
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script src="app.js"></script>
 
 </body>
