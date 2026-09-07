@@ -9,6 +9,24 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_KEY
 );
 
+async function signUp() {
+  const email = "joypan4442@gmail.com";
+  const password = "neodb727626pjy";
+
+  const { data, error } =
+    await supabaseClient.auth.signUp({
+      email,
+      password
+    });
+
+  console.log("SIGN UP:", {
+    data,
+    error
+  });
+}
+
+signUp();
+
 const BASE_SEARCH_API_URL =
   "https://neodb.social/api/catalog/search";
 
