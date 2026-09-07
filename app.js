@@ -604,7 +604,7 @@ async function saveMediaItem(item, button) {
             mediaItemId,
 
           status:
-            "planned"
+            "wishlist"
         })
         .select()
         .single();
