@@ -85,69 +85,93 @@
 
 
     <!-- App Content -->
-    <div
-      id="appContent"
-      class="app-content"
-      hidden
-    >
+  <!-- App Content -->
+<div
+  id="appContent"
+  class="app-content"
+  hidden
+>
 
-      <!-- Search -->
-      <section class="search-section">
+  <!-- Search Page -->
+  <div id="searchPage">
 
-        <div class="search-bar">
+    <!-- Search -->
+    <section class="search-section">
 
-          <input
-            id="searchInput"
-            type="text"
-            placeholder="Search NeoDB..."
-            autocomplete="off"
-          >
+      <div class="search-bar">
 
-          <button id="searchButton">
-            Search
-          </button>
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="Search NeoDB..."
+          autocomplete="off"
+        >
 
-        </div>
+        <button id="searchButton">
+          Search
+        </button>
 
-
-        <!-- Category -->
-        <div class="category-switch">
-
-          <button
-            class="category active"
-            data-category="book"
-          >
-            Books
-          </button>
-
-          <button
-            class="category"
-            data-category="movietv"
-          >
-            Movies & TV
-          </button>
-
-        </div>
-
-      </section>
-
-
-      <!-- Status -->
-      <div
-        id="status"
-        class="status"
-      >
-        Search for something you love.
       </div>
 
 
-      <!-- Results -->
-      <section
-        id="results"
-        class="results"
-      ></section>
+      <!-- Category -->
+      <div class="category-switch">
 
+        <button
+          class="category active"
+          data-category="book"
+        >
+          Books
+        </button>
+
+        <button
+          class="category"
+          data-category="movietv"
+        >
+          Movies & TV
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- Status -->
+    <div
+      id="status"
+      class="status"
+    >
+      Search for something you love.
     </div>
+
+
+    <!-- Search Results -->
+    <section
+      id="results"
+      class="results"
+    ></section>
+
+  </div>
+
+
+  <!-- Library Page -->
+  <div
+    id="libraryPage"
+    hidden
+  >
+
+    <div class="library-header">
+      <h2>My Library</h2>
+    </div>
+
+    <section
+      id="libraryResults"
+      class="results"
+    ></section>
+
+  </div>
+
+</div>
 
   </main>
 
