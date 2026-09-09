@@ -15,6 +15,15 @@ const authSection =
 const appContent =
   document.getElementById("appContent");
 
+const searchPage =
+  document.getElementById("searchPage");
+
+const libraryPage =
+  document.getElementById("libraryPage");
+
+const libraryResults =
+  document.getElementById("libraryResults");
+
 const authStatus =
   document.getElementById("authStatus");
 
@@ -823,6 +832,13 @@ async function updateAuthUI() {
     </div>
 
     <button
+      id="searchPageButton"
+      class="library-button"
+    >
+      Search
+    </button>
+
+    <button
       id="libraryButton"
       class="library-button"
     >
@@ -846,10 +862,18 @@ async function updateAuthUI() {
       );
 
     document
+  .getElementById("searchPageButton")
+  .addEventListener(
+    "click",
+    showSearchPage
+  );
+
+
+    document
       .getElementById("libraryButton")
       .addEventListener(
         "click",
-        loadLibrary
+        showLibraryPage
       );
 
 
@@ -921,8 +945,8 @@ async function loadLibrary() {
   statusElement.textContent =
     "Loading your library...";
 
-  resultsContainer.innerHTML =
-    "";
+  libraryResults.innerHTML =
+  "";
 
   try {
 
@@ -1001,8 +1025,8 @@ async function loadLibrary() {
       `${data.length} items in your library.`;
 
 
-    resultsContainer.innerHTML =
-      data.map(libraryItem => {
+    libraryResults.innerHTML =
+  data.map(libraryItem => {
 
         const item =
           libraryItem.media_items;
@@ -1078,7 +1102,7 @@ async function loadLibrary() {
     statusElement.textContent =
       "Failed to load your library.";
 
-    resultsContainer.innerHTML =
+    libraryResults.innerHTML =
       `
         <p class="error-message">
           ${escapeHtml(
@@ -1088,5 +1112,24 @@ async function loadLibrary() {
       `;
 
   }
+
+}
+
+function showSearchPage() {
+
+  searchPage.hidden = false;
+
+  libraryPage.hidden = true;
+
+}
+
+
+async function showLibraryPage() {
+
+  searchPage.hidden = true;
+
+  libraryPage.hidden = false;
+
+  await loadLibrary();
 
 }
