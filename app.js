@@ -815,20 +815,27 @@ async function updateAuthUI() {
 
 
     authStatus.innerHTML =
-      `
-        <div class="signed-in-user">
-          ${escapeHtml(
-            session.user.email
-          )}
-        </div>
+  `
+    <div class="signed-in-user">
+      ${escapeHtml(
+        session.user.email
+      )}
+    </div>
 
-        <button
-          id="signOutButton"
-          class="sign-out-button"
-        >
-          Sign out
-        </button>
-      `;
+    <button
+      id="libraryButton"
+      class="library-button"
+    >
+      Library
+    </button>
+
+    <button
+      id="signOutButton"
+      class="sign-out-button"
+    >
+      Sign out
+    </button>
+  `;
 
 
     document
@@ -836,6 +843,13 @@ async function updateAuthUI() {
       .addEventListener(
         "click",
         signOut
+      );
+
+    document
+      .getElementById("libraryButton")
+      .addEventListener(
+        "click",
+        loadLibrary
       );
 
 
@@ -899,3 +913,180 @@ passwordInput.addEventListener(
 );
 
 updateAuthUI();
+
+async function loadLibrary() {
+
+  console.log("Loading library...");
+
+  statusElement.textContent =
+    "Loading your library...";
+
+  resultsContainer.innerHTML =
+    "";
+
+  try {
+
+    const {
+      data: {
+        session
+      }
+    } =
+      await supabaseClient.auth.getSession();
+
+
+    if (!session) {
+
+      throw new Error(
+        "Please sign in first."
+      );
+
+    }
+
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from("library_items")
+        .select(`
+          id,
+          status,
+          added_at,
+          media_items (
+            id,
+            neodb_uuid,
+            category,
+            title,
+            cover_image_url,
+            description
+          )
+        `)
+        .eq(
+          "user_id",
+          session.user.id
+        )
+        .order(
+          "added_at",
+          {
+            ascending: false
+          }
+        );
+
+
+    if (error) {
+
+      throw error;
+
+    }
+
+
+    console.log(
+      "Library items:",
+      data
+    );
+
+
+    if (!data || data.length === 0) {
+
+      statusElement.textContent =
+        "Your library is empty.";
+
+      return;
+
+    }
+
+
+    statusElement.textContent =
+      `${data.length} items in your library.`;
+
+
+    resultsContainer.innerHTML =
+      data.map(libraryItem => {
+
+        const item =
+          libraryItem.media_items;
+
+
+        if (!item) {
+          return "";
+        }
+
+
+        const cover =
+          item.cover_image_url
+            ? `
+              <img
+                src="${escapeHtml(
+                  item.cover_image_url
+                )}"
+                alt="${escapeHtml(
+                  item.title || ""
+                )}"
+                class="cover-img"
+                loading="lazy"
+              >
+            `
+            : `
+              <div class="empty-cover">
+                No Cover
+              </div>
+            `;
+
+
+        return `
+          <article class="result-item">
+
+            ${cover}
+
+            <div class="result-info">
+
+              <h2 class="result-title">
+                ${escapeHtml(
+                  item.title || "Unknown"
+                )}
+              </h2>
+
+              <div class="meta">
+                ${escapeHtml(
+                  item.category || ""
+                )}
+              </div>
+
+              <div class="meta">
+                Status:
+                ${escapeHtml(
+                  libraryItem.status || ""
+                )}
+              </div>
+
+            </div>
+
+          </article>
+        `;
+
+      }).join("");
+
+
+  } catch (error) {
+
+    console.error(
+      "Load library failed:",
+      error
+    );
+
+    statusElement.textContent =
+      "Failed to load your library.";
+
+    resultsContainer.innerHTML =
+      `
+        <p class="error-message">
+          ${escapeHtml(
+            error.message
+          )}
+        </p>
+      `;
+
+  }
+
+}
